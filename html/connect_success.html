@@ -1,0 +1,92 @@
+<html>
+<head>
+    <head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px; /* Padding added */
+            background-color: #111827; /* Dark background color */
+            color: #f0f0f0; /* Light font color */
+            font-size: 18px; /* Increased font size for readability */
+        }
+
+        h1, h2, h5, p, form {
+            margin: 20px auto;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 32px; /* Increased font size for headings */
+            text-align: center;
+        }
+
+        h1 span, h5 span {
+            color: #fdfdfd;
+        }
+
+        table {
+            width: 100%;
+            margin: 20px auto;
+        }
+
+        td {
+            padding: 8px;
+        }
+
+        input[type="radio"], input[type="password"], input[type="submit"] {
+            margin: 20px 0; /* Increased margin for inputs */
+        }
+
+        input[type="password"], input[type="submit"] {
+            font-size: 18px; /* Increased font size for inputs */
+            padding: 20px; /* Increased padding for inputs */
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Stylizing the back button */
+        .back-button {
+            font-size: 24px; /* Increased font size for inputs */
+            padding: 20px 60px; /* Increased padding for inputs */
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin: 20px auto;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+
+        form {
+            text-align: center; /* Center the form elements */
+        }
+
+        @media (max-width: 600px) {
+            h1, h2, h5, p, form {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<h1>
+    <span>
+        ESP successfully connected to WiFi network {{ ssid }}.
+    </span>
+</h1>
+</html>

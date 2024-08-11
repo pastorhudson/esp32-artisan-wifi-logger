@@ -1,0 +1,118 @@
+<html>
+<head>
+    <style>
+         body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px; /* Padding added */
+                background-color: #111827; /* Dark background color */
+                color: #f0f0f0;  /* Light font color */
+                font-size: 18px; /* Increased font size for readability */
+            }
+
+            h1, h2, h5, p, form {
+                margin: 20px auto;
+                width: 90%;
+                max-width: 600px;
+            }
+
+            h1 {
+                font-size: 32px; /* Increased font size for headings */
+                text-align: center;
+            }
+
+            h1 span, h5 span {
+                color: #fdfdfd;
+            }
+
+            table {
+                width: 100%;
+                margin: 20px auto;
+            }
+
+            td {
+                padding: 8px;
+            }
+
+            input[type="radio"], input[type="password"], input[type="submit"] {
+                margin: 20px 0; /* Increased margin for inputs */
+            }
+
+            input[type="password"], input[type="submit"] {
+                font-size: 18px; /* Increased font size for inputs */
+                /*padding: 20px; !* Increased padding for inputs *!*/
+            }
+
+            input[type="submit"] {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #45a049;
+            }
+
+            @media (max-width: 600px) {
+                h1, h2, h5, p, form {
+                    width: 100%;
+                }
+            }
+         /* Increase font size of labels */
+       label {
+           font-size: 72px; /* You can adjust this value as per your need */
+           padding-left: 15px;
+       }
+
+       /* Increase radio buttons size */
+       input[type="radio"] {
+           transform: scale(3); /* You can adjust this value as per your need */
+           margin-right: 20px; /* Add some space between radio button and label text */
+       }
+              /* Style the submit button */
+       input[type="submit"] {
+           font-size: 24px; /* Increase font size */
+           padding: 12px 24px; /* Increase padding */
+           background-color: #4CAF50;
+           color: white;
+           border: none;
+           cursor: pointer;
+       }
+       input[type="password"] {
+    font-size: 24px;  /* Increase font size */
+    padding: 12px;  /* Increase padding */
+}
+    </style>
+</head>
+<body>
+<h1><span>Coffee Logger Wifi Setup</span></h1>
+<form action="configure" method="post">
+    <table>
+        <tbody>
+        {{ ssid_list }}
+            <td>Password:</td>
+            <td><input name="password" type="password"/></td>
+        </tr>
+        </tbody>
+    </table>
+    <p style="text-align: center;">
+        <input type="submit" value="Submit"/>
+    </p>
+</form>
+<hr/>
+<h5><span>Your ssid and password information will be saved into the
+                "wifi.dat" file in your ESP module for future usage.
+                Be careful about security!</span></h5>
+<hr/>
+<h2>Some useful infos:</h2>
+<ul>
+    <li>Original code from <a href="https://github.com/cpopp/MicroPythonSamples"
+                              target="_blank" rel="noopener">cpopp/MicroPythonSamples</a>.
+    </li>
+    <li>This code available at <a href="https://github.com/tayfunulu/WiFiManager"
+                                  target="_blank" rel="noopener">tayfunulu/WiFiManager</a>.
+    </li>
+</ul>
+</body>
+</html>

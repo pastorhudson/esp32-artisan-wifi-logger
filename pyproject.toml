@@ -1,0 +1,8 @@
+
+[tool.belay.dependencies]
+max6675 = "https://github.com/BrianPugh/micropython-libs/blob/main/lib/max6675.py"
+microdot = "https://github.com/miguelgrinberg/microdot/blob/main/src/microdot/microdot.py"
+controlhal = "https://github.com/BrianPugh/micropython-libs/blob/main/lib/controlhal.py"
+
+[tool.pytest.ini_options]
+pythonpath = ".belay/dependencies/main"
