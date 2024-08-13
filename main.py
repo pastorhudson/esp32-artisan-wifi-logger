@@ -3,23 +3,35 @@ from machine import Pin, SPI
 from max6675 import Max6675
 from microdot import Microdot, Response
 import wifimgr
+import random
 
 # Initialize thermocouple
-cs = Pin(15, Pin.OUT)
-spi = SPI(1, baudrate=1000000, polarity=0, phase=0, sck=Pin(14), mosi=Pin(13), miso=Pin(12))
-sensor = Max6675(spi, cs)
+# Initialize the SPI interface
+spi = SPI(1, baudrate=4000000, polarity=0, phase=0, sck=Pin(18), mosi=None, miso=Pin(12))
+# Initialize the chip select pin
+cs_pin = Pin(5, Pin.OUT)
+
+# Create an instance of the Max6675 class
+temperature_sensor = Max6675(spi, cs_pin)
 
 # Initialize web server
 app = Microdot()
 
-# Asynchronous function to read temperature
+
+# Asynchronous function to generate mock temperature data
 async def read_temperature():
-    return sensor.read()
+    return temperature_sensor.read()
+# async def read_temperature():
+#     # Mock temperature data between 20 and 100 degrees Celsius
+
+#     return round(random.uniform(20.0, 100.0), 2)
+
 
 # Asynchronous function to write data to a file
 async def write_to_file(data):
     with open('/data.txt', 'a') as f:
         f.write('{}\n'.format(data))
+
 
 # Asynchronous task to log temperature periodically
 async def temperature_logging_task():
@@ -28,42 +40,27 @@ async def temperature_logging_task():
         await write_to_file(temp)
         await asyncio.sleep(1)  # Adjust the interval as needed
 
+
+async def get_coffee_html():
+    with open('html/coffee_log.html', 'r') as html_file:
+        coffee_html = html_file.read()
+    return coffee_html
+
+
 # Route for serving the index page with the chart
 @app.route('/')
 async def index(request):
-    try:
-        with open('/data.txt', 'r') as f:
-            data = f.read()
-    except OSError:
-        data = ""
+    coffee_html = await get_coffee_html()
+    headers = {'Content-Type': 'text/html'}
+    return Response(body=coffee_html, headers=headers)
 
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Temperature Data</title>
-        <script src="https://code.highcharts.com/highcharts.js"></script>
-    </head>
-    <body>
-        <div id="container" style="width:100%; height:400px;"></div>
-        <script>
-            const data = `{}`;
-            const lines = data.trim().split('\\n');
-            const seriesData = lines.map(line => parseFloat(line));
 
-            Highcharts.chart('container', {
-                title: { text: 'Temperature Data' },
-                series: [{
-                    name: 'Temperature',
-                    data: seriesData
-                }]
-            });
-        </script>
-    </body>
-    </html>
-    """.format(data)
+@app.route('/data')
+async def data(request):
+    temp = await read_temperature()
+    headers = {'Content-Type': 'application/json'}
+    return Response(body={'data': [temp]}, headers=headers)
 
-    return Response(body=html_content, content_type='text/html')
 
 # Main function to handle WiFi setup, server, and logging
 async def main():
@@ -82,6 +79,7 @@ async def main():
     # Main loop to keep the program running
     while True:
         await asyncio.sleep(1)
+
 
 # Run the main function in an asyncio loop
 try:
