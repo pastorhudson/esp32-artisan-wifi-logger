@@ -10,8 +10,13 @@ ap_authmode = 3  # WPA2
 
 NETWORK_PROFILES = 'wifi.dat'
 
+# Set the hostname for mDNS
+network.hostname('coffeelog')
+
 wlan_ap = network.WLAN(network.AP_IF)
 wlan_sta = network.WLAN(network.STA_IF)
+
+
 
 server_socket = None
 
