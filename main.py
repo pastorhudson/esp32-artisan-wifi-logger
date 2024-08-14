@@ -213,7 +213,9 @@ async def data(request):
 @app.route('/download')
 async def download_data(request):
     try:
-        return send_file(log_file_path)
+        headers = {'Content-Type': 'text/csv'}
+
+        return send_file(log_file_path, content_type=headers['Content-Type'], )
     except Exception as e:
         print(e)
         headers = {'Content-Type': 'text/html'}
