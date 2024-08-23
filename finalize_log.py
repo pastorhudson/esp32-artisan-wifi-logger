@@ -1,4 +1,10 @@
 
+def parse_iso8601(time_stamp):
+    date, time = time_stamp.split('T')
+    year, month, day = map(int, date.split('-'))
+    hour, minute, second = map(int, time[:-1].split(':'))  # Remove 'Z' and split
+    # Assuming no timezone offsets for simplicity and ignoring milliseconds
+    return (year, month, day, hour, minute, second)
 
 
 def get_last_line_time(log_file_path):
@@ -10,7 +16,7 @@ def get_last_line_time(log_file_path):
         return ''
 
 
-def make_first_line(events, log_file_path):
+def make_first_line(events, log_file_path, time_stamp):
     # Load log file
     with open(log_file_path, 'r') as f:
         lines = f.readlines()
@@ -28,7 +34,8 @@ def make_first_line(events, log_file_path):
             event_times[event] = time
 
     # Construct the initial line with the appropriate times
-    date_str = 'Date:11.08.2024'  # Replace with your actual date string
+    date_stamp = parse_iso8601(time_stamp)
+    date_str = f'Date:{date_stamp[1]}.{date_stamp[2]}.{date_stamp[0]}'  # Replace with your actual date string
     initial_line = f"{date_str}\tUnit:F"
 
     # Add the events in the specified order with their times
@@ -45,7 +52,18 @@ def make_first_line(events, log_file_path):
     return initial_line
 
 
-def add_events_to_log(events, log_file_path):
+def add_events_to_log(events, log_file_path, time_stamp):
+    """
+    Add events to a log file.
+
+    :param events: A dictionary containing the events to be added. The keys represent the timestamps and the values
+                   represent the events.
+    :type events: dict
+    :param log_file_path: The path of the log file to be updated.
+    :type log_file_path: str
+    :param time_stamp: The timestamp for which the events will be added.
+    :type time_stamp: str
+    """
     updated_log = []
     with open(log_file_path, 'r') as f:
         lines = f.readlines()
@@ -57,15 +75,13 @@ def add_events_to_log(events, log_file_path):
             parts.append((','.join(event_list) + '\n'))
         else:
             parts.append('\n')
-            # parts.append('\n')
 
         updated_log.append('\t'.join(parts))
-        print(updated_log)
 
     with open(log_file_path, 'w') as f:
         for line in updated_log:
             f.write(line)
-    make_first_line(events, log_file_path)
+    make_first_line(events, log_file_path, time_stamp)
 
 
 if __name__ == '__main__':

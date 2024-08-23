@@ -130,15 +130,15 @@
         <label for="fanSelector">Fan:</label>
         <select id="fanSelector" style="padding: 5px; font-size: 16px;" onchange="updateField('Fan ' + this.value)">
             <option value="0">off</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
+            <option value="11">1</option>
+            <option value="22">2</option>
+            <option value="33">3</option>
+            <option value="44">4</option>
+            <option value="55">5</option>
+            <option value="66">6</option>
+            <option value="77">7</option>
+            <option value="88">8</option>
+            <option value="99">9</option>
         </select>
     </div>
     <!-- Add Power Dropdown -->
@@ -146,15 +146,15 @@
         <label for="powerSelector">Power:</label>
         <select id="powerSelector" style="padding: 5px; font-size: 16px;" onchange="updateField('Pow ' + this.value)">
             <option value="0">off</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            <option value="11">1</option>
+            <option value="22">2</option>
+            <option value="33">3</option>
+            <option value="44">4</option>
+            <option value="55">5</option>
             <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
+            <option value="77">7</option>
+            <option value="88">8</option>
+            <option value="99">9</option>
         </select>
     </div>
 </div>
@@ -178,7 +178,8 @@
 
 
 <script>
-    const coffeeBeanSVG = '';
+
+     const coffeeBeanSVG = '';
 
     let chart = Highcharts.chart('container', {
         title: {
@@ -222,19 +223,16 @@
             name: 'Temperature',
             data: [0],
             color: '#6f4e37',
-            marker: {
-                symbol: 'url(' + coffeeBeanSVG + ')',
-                width: 16,
-                height: 16,
-                states: {
-                    hover: {
-                        enabled: false
-                    },
-                    select: {
-                        enabled: false
-                    }
-                }
-            }
+        },
+            {
+            name: 'Fan Speed',
+            data: [0],
+            color: '#3382ba'
+        },
+        {
+            name: 'Power',
+            data: [0],
+            color: '#ca0505'
         }],
         responsive: {
             rules: [{
@@ -272,7 +270,8 @@
 
         dataWs.onmessage = function(event) {
             let receivedData = JSON.parse(event.data);
-            updateChart(receivedData.data);
+            console.log(receivedData)
+            updateChart(receivedData);
         };
 
         dataWs.onclose = function() {
@@ -298,14 +297,19 @@
         };
     }
 
-    function updateChart(data) {
+
+function updateChart(data) {
     if (data !== null) {
-        let temp = data[0];  // Access the first element in the data array
-        let elapsedTime = data[1];  // Access the second element in the data array
+        let temp = data.temperature;  // Access the first element in the data array
+        let elapsedTime = data.elapsed_time;  // Access the second element in the data array
+        let fan_speed = data.fan_speed;
+        let power = data.power;
 
         let numericValue = parseFloat(temp);
         if (!isNaN(numericValue)) {
             chart.series[0].addPoint(numericValue, true);
+            chart.series[1].addPoint(fan_speed, true);
+            chart.series[2].addPoint(power, true);
             console.log('Point added to chart:', numericValue);
             document.getElementById('recentTemp').innerHTML = numericValue + '&deg;F';
 
@@ -323,7 +327,10 @@
         }
     }
 }
+</script>
 
+
+<script>
 function updateField(eventName) {
         if (eventWs.readyState === WebSocket.OPEN) {
             eventWs.send(JSON.stringify({event: eventName}));
@@ -347,18 +354,22 @@ function updateField(eventName) {
         document.body.removeChild(link);
     }
 
-    function stopRoast() {
-        // Send the "STOP" event
-        updateField('STOP');
+function stopRoast() {
+    // Capture the current date and time in ISO 8601 format (e.g., "2020-01-01T00:00:00Z")
+    let now = new Date().toISOString();
 
-        // Reset Fan and Power to 0
-        document.getElementById('fanSelector').value = "0";
-        document.getElementById('powerSelector').value = "0";
-
-        // Send WebSocket events for the reset Fan and Power values
-        // updateField('Fan 0');
-        // updateField('Pow 0');
+    // Send the "STOP" event with the current date and time
+    if (eventWs.readyState === WebSocket.OPEN) {
+        eventWs.send(JSON.stringify({event: 'STOP', timestamp: now}));
+        console.log('Stop event sent with timestamp:', now);
+    } else {
+        console.error('WebSocket is not open. Cannot send stop event.');
     }
+
+    // Reset Fan and Power to 0
+    document.getElementById('fanSelector').value = "0";
+    document.getElementById('powerSelector').value = "0";
+}
 
 </script>
 </body>

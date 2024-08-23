@@ -25,6 +25,8 @@ roast_start_time = 0  # Set this appropriately
 is_roast_active = False  # This should be set based on whether the roast is active or not
 charge_started = False
 charge_start_time = 0
+fan_speed = 0
+power = 0
 
 
 async def read_temperature():
@@ -62,18 +64,6 @@ async def temperature_logging_task():
         await asyncio.sleep(1)
 
 
-# Define a WebSocket route using the with_websocket decorator
-@app.route('/ws')
-@with_websocket
-async def websocket(request, ws: WebSocket):
-    while True:
-        message = await ws.receive()
-        if message is None:
-            break
-        print('Received via WebSocket:', message)
-        await ws.send('Echo: ' + message)
-
-
 async def get_coffee_html():
     with open('html/coffee_log.html', 'r') as html_file:
         coffee_html = html_file.read()
@@ -92,22 +82,24 @@ async def start_roast():
     if not is_roast_active:
         roast_start_time = time.time()
         is_roast_active = True
+        # Open the log file in write mode to reset or create a new file
+        with open(log_file_path, 'w') as log_file:
+            pass
 
-
-async def stop_roast():
+async def stop_roast(time_stamp):
     global is_roast_active, roast_start_time, charge_started, charge_start_time, events
     if is_roast_active:
         is_roast_active = False
         roast_start_time = 0
         charge_started = False
         charge_start_time = 0
-        add_events_to_log(events, log_file_path)
+        add_events_to_log(events, log_file_path, time_stamp)
 
 
 @app.route('/ws/add_event')
 @with_websocket
 async def add_event_websocket(request, ws):
-    global is_roast_active, events, charge_started, charge_start_time
+    global is_roast_active, events, charge_started, charge_start_time, fan_speed, power
     try:
         while True:
             # Receive event name from the client
@@ -117,6 +109,11 @@ async def add_event_websocket(request, ws):
             # Parse the event name from the received message
             event_data = json.loads(message)
             event_name = event_data.get('event')
+
+            if 'Fan' in event_name:
+                fan_speed = int(event_name.split(" ")[1])
+            if 'Pow' in event_name:
+                power = int(event_name.split(" ")[1])
 
             # Calculate total elapsed time
             elapsed_time = time.time() - roast_start_time
@@ -128,7 +125,9 @@ async def add_event_websocket(request, ws):
                 await start_roast()
                 print(f"Roast Started!")
             elif event_name == 'STOP':
-                await stop_roast()
+                time_stamp = event_data.get('timestamp')
+                print(time_stamp)
+                await stop_roast(time_stamp)
                 print(f"Roast Stopped!")
             elif is_roast_active:
                 # Add the event to the global dictionary
@@ -152,15 +151,21 @@ async def add_event_websocket(request, ws):
 @app.route('/ws/data')
 @with_websocket
 async def data_websocket(request, ws: WebSocket):
+    global fan_speed, power
     connected_clients.append(ws)
     try:
         while True:
-            # Read temperature and calculate elapsed time
+            # Read temperature, fan speed, power, and calculate elapsed time
             temp = await read_temperature()
-            elapsed_time = time.time() - roast_start_time if is_roast_active else 0
 
+            elapsed_time = time.time() - roast_start_time if is_roast_active else 0
             # Prepare the data as a JSON string
-            data = {'data': [temp, elapsed_time]}
+            data = {
+                'temperature': temp,
+                'fan_speed': fan_speed,
+                'power': power,
+                'elapsed_time': elapsed_time
+            }
             json_data = json.dumps(data)  # Serialize the dictionary to a JSON string
 
             # Send the JSON string back to all connected clients
@@ -183,6 +188,7 @@ async def data_websocket(request, ws: WebSocket):
         # Ensure the WebSocket is closed cleanly and remove it from the list
         await ws.close()
         connected_clients.remove(ws)
+
 
 
 @app.route('/download')
