@@ -11,10 +11,12 @@
             padding: 0;
             font-family: Arial, sans-serif;
         }
+
         #container {
             max-width: 1000px;
             margin: 0 auto;
         }
+
         #intervalSelectorContainer {
             display: flex;
             justify-content: space-between;
@@ -23,13 +25,16 @@
             font-size: 16px;
             max-width: 500px;
         }
+
         #intervalSelectorLabel {
             margin-bottom: 5px;
         }
+
         #intervalSelector {
             padding: 5px;
             font-size: 16px;
         }
+
         #recentTemp {
             display: flex;
             justify-content: center;
@@ -45,15 +50,18 @@
             margin-left: 10px;
             padding: 2px;
         }
+
         #elapsedTime {
             font-size: 20px;
             color: #6f4e37;
             margin-left: 10px;
         }
+
         #updateButtons {
             margin-top: 20px;
             text-align: center;
         }
+
         .updateButton {
             padding: 10px 20px;
             margin: 5px;
@@ -64,13 +72,16 @@
             font-size: 16px;
             border-radius: 5px;
         }
+
         .updateButton:hover {
             background-color: #53382a;
         }
+
         #downloadButton {
             margin-top: 20px;
             text-align: center;
         }
+
         .downloadButton {
             padding: 10px 20px;
             margin: 5px;
@@ -81,13 +92,16 @@
             font-size: 16px;
             border-radius: 5px;
         }
+
         .downloadButton:hover {
             background-color: #0e5ea3;
         }
+
         #controlButtons {
             margin-top: 20px;
             text-align: center;
         }
+
         .controlButton {
             padding: 10px 20px;
             margin: 5px;
@@ -98,244 +112,254 @@
             font-size: 16px;
             border-radius: 5px;
         }
+
         .controlButton:hover {
             background-color: #8f6149;
         }
     </style>
 </head>
 <body>
-    <div id="container" style="width:100%; height:400px;"></div>
+<div id="container" style="width:100%; height:400px;"></div>
 
-    <div id="intervalSelectorContainer">
-        <div id="recentTemp">--</div>
-        <div id="elapsedTime">Elapsed Time: 00:00</div>
-        <div>
-            <label id="intervalSelectorLabel" for="intervalSelector">Update Interval:</label>
-            <select id="intervalSelector">
-                <option value="1000">1 Second</option>
-                <option value="2000">2 Seconds</option>
-                <option value="3000">3 Seconds</option>
-                <option value="4000">4 Seconds</option>
-                <option value="5000" selected>5 Seconds</option>
-                <option value="6000">6 Seconds</option>
-                <option value="7000">7 Seconds</option>
-                <option value="8000">8 Seconds</option>
-                <option value="9000">9 Seconds</option>
-                <option value="10000">10 Seconds</option>
-            </select>
-        </div>
+<div id="intervalSelectorContainer">
+    <div id="recentTemp">--</div>
+    <div id="elapsedTime">00:00</div>
+
+    <!-- Add Fan Dropdown -->
+    <div>
+        <label for="fanSelector">Fan:</label>
+        <select id="fanSelector" style="padding: 5px; font-size: 16px;" onchange="updateField('Fan ' + this.value)">
+            <option value="0">off</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+        </select>
     </div>
-
-    <div id="updateButtons">
-        <button class="controlButton" onclick="startRoast()">Start Roast</button>
-        <button class="updateButton" onclick="updateField('CHARGE')">Charge</button>
-        <button class="updateButton" onclick="updateField('TP')">Turning Point</button>
-        <button class="updateButton" onclick="updateField('DRYe')">Dry End</button>
-        <button class="updateButton" onclick="updateField('FCs')">FC Start</button>
-        <button class="updateButton" onclick="updateField('FCe')">FC End</button>
-        <button class="updateButton" onclick="updateField('SCs')">SC Start</button>
-        <button class="updateButton" onclick="updateField('SCe')">SC End</button>
-        <button class="updateButton" onclick="updateField('DROP')">Drop</button>
-        <button class="controlButton" onclick="stopRoast()">Stop Roast</button>
-        <!-- Add more buttons for other fields as needed -->
-          <div id="downloadButtonContainer">
-    <button id="downloadButton" class="downloadButton" onclick="downloadCSV()">Download Artisan CSV</button>
+    <!-- Add Power Dropdown -->
+    <div>
+        <label for="powerSelector">Power:</label>
+        <select id="powerSelector" style="padding: 5px; font-size: 16px;" onchange="updateField('Pow ' + this.value)">
+            <option value="0">off</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+        </select>
+    </div>
 </div>
+
+<div id="updateButtons">
+    <button class="controlButton" onclick="updateField('START')">Start Roast</button>
+    <button class="updateButton" onclick="updateField('CHARGE')">Charge</button>
+    <button class="updateButton" onclick="updateField('TP')">Turning Point</button>
+    <button class="updateButton" onclick="updateField('DRYe')">Dry End</button>
+    <button class="updateButton" onclick="updateField('FCs')">FC Start</button>
+    <button class="updateButton" onclick="updateField('FCe')">FC End</button>
+    <button class="updateButton" onclick="updateField('SCs')">SC Start</button>
+    <button class="updateButton" onclick="updateField('SCe')">SC End</button>
+    <button class="updateButton" onclick="updateField('DROP')">Drop</button>
+    <button class="controlButton" onclick="stopRoast()">Stop Roast</button>
+    <!-- Add more buttons for other fields as needed -->
+    <div id="downloadButtonContainer">
+        <button id="downloadButton" class="downloadButton" onclick="downloadCSV()">Download Artisan CSV</button>
     </div>
+</div>
 
 
+<script>
+    const coffeeBeanSVG = '';
 
-    <script>
-        const coffeeBeanSVG = '';
-
-        let chart = Highcharts.chart('container', {
+    let chart = Highcharts.chart('container', {
+        title: {
+            text: 'Roast Temperature',
+            style: {
+                color: '#3d2b1e'
+            }
+        },
+        chart: {
+            type: 'line',
+            marginTop: 50,
+            spacingLeft: 10,
+            spacingRight: 10,
+        },
+        xAxis: {
+            labels: {
+                style: {
+                    color: '#6f4e37'
+                }
+            },
+        },
+        yAxis: {
             title: {
-                text: 'Roast Temperature',
+                text: 'Temperature',
+                style: {
+                    color: '#6f4e37'
+                }
+            },
+            labels: {
                 style: {
                     color: '#3d2b1e'
                 }
-            },
-            chart: {
-                type: 'line',
-                marginTop: 50,
-                spacingLeft: 10,
-                spacingRight: 10,
-            },
-            xAxis: {
-                labels: {
-                    style: {
-                        color: '#6f4e37'
-                    }
-                },
-            },
-            yAxis: {
-                title: {
-                    text: 'Temperature',
-                    style: {
-                        color: '#6f4e37'
-                    }
-                },
-                labels: {
-                    style: {
-                        color: '#3d2b1e'
-                    }
-                }
-            },
-            legend: {
-                itemStyle: {
-                    color: '#3d2b1e'
-                }
-            },
-            series: [{
-                name: 'Temperature',
-                data: [0],
-                color: '#6f4e37',
-                marker: {
-                    symbol: 'url(' + coffeeBeanSVG + ')',
-                    width: 16,
-                    height: 16,
-                    states: {
-                        hover: {
-                            enabled: false
-                        },
-                        select: {
-                            enabled: false
-                        }
-                    }
-                }
-            }],
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
+            }
+        },
+        legend: {
+            itemStyle: {
+                color: '#3d2b1e'
+            }
+        },
+        series: [{
+            name: 'Temperature',
+            data: [0],
+            color: '#6f4e37',
+            marker: {
+                symbol: 'url(' + coffeeBeanSVG + ')',
+                width: 16,
+                height: 16,
+                states: {
+                    hover: {
+                        enabled: false
                     },
-                    chartOptions: {
-                        chart: {
-                            height: 'auto',
-                            width: null
-                        },
-                        legend: {
-                            layout: 'horizontal',
-                            align: 'center',
-                            verticalAlign: 'bottom'
-                        },
-                        yAxis: {
-                            title: { text: '' },
-                            labels: { align: 'left', x: 0, y: -5 }
-                        }
-                    }
-                }]
-            }
-        });
-
-        async function fetchData() {
-            try {
-                const response = await fetch('/data');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const json = await response.json();
-                return json.data;
-            } catch (error) {
-                console.error('There has been a problem with your fetch operation:', error);
-                return null;
-            }
-        }
-
-        function updateChart() {
-            fetchData().then(data => {
-                if (data !== null) {
-                    let [temp, elapsedTime] = data;
-                    let numericValue = parseFloat(temp);
-                    if (!isNaN(numericValue)) {
-                        chart.series[0].addPoint(numericValue, true);
-                        console.log('Point added to chart:', numericValue);
-                        document.getElementById('recentTemp').innerHTML = numericValue + '&deg;F';
-
-                        // Update elapsed time
-                        let minutes = Math.floor(elapsedTime / 60);
-                        let seconds = Math.floor(elapsedTime % 60);
-                        document.getElementById('elapsedTime').innerHTML = `Elapsed Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                        // Check if the temperature is zero and elapsed time is zero
-                        if (elapsedTime === 0) {
-                            document.getElementById('downloadButtonContainer').style.display = 'block';
-                        }
-                        else {
-                            document.getElementById('downloadButtonContainer').style.display = 'none';
-                        }
+                    select: {
+                        enabled: false
                     }
                 }
-            });
-        }
-
-        async function updateField(field) {
-            try {
-                const response = await fetch('/update_log', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+            }
+        }],
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    chart: {
+                        height: 'auto',
+                        width: null
                     },
-                    body: JSON.stringify({ ['fields']: field })
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Field updated:', result);
-                } else {
-                    console.error('Failed to update field');
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    },
+                    yAxis: {
+                        title: {text: ''},
+                        labels: {align: 'left', x: 0, y: -5}
+                    }
                 }
-            } catch (error) {
-                console.error('Error:', error);
+            }]
+        }
+    });
+
+    let dataWs, eventWs;
+
+    function connectWebSocket() {
+        dataWs = new WebSocket('ws://coffeelog.local/ws/data');
+        eventWs = new WebSocket('ws://coffeelog.local/ws/add_event'); // New WebSocket for events
+
+        dataWs.onopen = function() {
+            console.log('Data WebSocket is open now.');
+        };
+
+        dataWs.onmessage = function(event) {
+            let receivedData = JSON.parse(event.data);
+            updateChart(receivedData.data);
+        };
+
+        dataWs.onclose = function() {
+            console.log('Data WebSocket is closed now. Reconnecting...');
+            setTimeout(connectWebSocket, 1000); // Attempt to reconnect after 1 second
+        };
+
+        dataWs.onerror = function(error) {
+            console.error('Data WebSocket error:', error);
+        };
+
+        eventWs.onopen = function() {
+            console.log('Event WebSocket is open now.');
+        };
+
+        eventWs.onclose = function() {
+            console.log('Event WebSocket is closed now. Reconnecting...');
+            setTimeout(connectWebSocket, 1000); // Attempt to reconnect after 1 second
+        };
+
+        eventWs.onerror = function(error) {
+            console.error('Event WebSocket error:', error);
+        };
+    }
+
+    function updateChart(data) {
+    if (data !== null) {
+        let temp = data[0];  // Access the first element in the data array
+        let elapsedTime = data[1];  // Access the second element in the data array
+
+        let numericValue = parseFloat(temp);
+        if (!isNaN(numericValue)) {
+            chart.series[0].addPoint(numericValue, true);
+            console.log('Point added to chart:', numericValue);
+            document.getElementById('recentTemp').innerHTML = numericValue + '&deg;F';
+
+            // Update elapsed time
+            let minutes = Math.floor(elapsedTime / 60);
+            let seconds = Math.floor(elapsedTime % 60);
+            document.getElementById('elapsedTime').innerHTML = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Check if the temperature is zero and elapsed time is zero
+            if (elapsedTime === 0) {
+                document.getElementById('downloadButtonContainer').style.display = 'block';
+            } else {
+                document.getElementById('downloadButtonContainer').style.display = 'none';
             }
         }
+    }
+}
 
-        async function startRoast() {
-            try {
-                const response = await fetch('/start_roast', {
-                    method: 'POST'
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Roast started:', result);
-                } else {
-                    console.error('Failed to start roast');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+function updateField(eventName) {
+        if (eventWs.readyState === WebSocket.OPEN) {
+            eventWs.send(JSON.stringify({event: eventName}));
+            console.log('Event sent:', eventName);
+        } else {
+            console.error('WebSocket is not open. Cannot send event:', eventName);
         }
+    }
 
-        async function stopRoast() {
-            try {
-                const response = await fetch('/stop_roast', {
-                    method: 'POST'
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Roast stopped:', result);
-                } else {
-                    console.error('Failed to stop roast');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
+    // Initialize the WebSocket connection when the page loads
+    window.onload = function () {
+        connectWebSocket();
+    };
 
-        function downloadCSV() {
-            const link = document.createElement('a');
-            link.href = '/download';
-            link.download = 'my_roast.csv';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+    function downloadCSV() {
+        const link = document.createElement('a');
+        link.href = '/download';
+        link.download = 'my_roast.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
-        let intervalId = setInterval(updateChart, 5000);
+    function stopRoast() {
+        // Send the "STOP" event
+        updateField('STOP');
 
-        document.getElementById('intervalSelector').addEventListener('change', function() {
-            clearInterval(intervalId);
-            let newInterval = parseInt(this.value);
-            intervalId = setInterval(updateChart, newInterval);
-        });
-    </script>
+        // Reset Fan and Power to 0
+        document.getElementById('fanSelector').value = "0";
+        document.getElementById('powerSelector').value = "0";
+
+        // Send WebSocket events for the reset Fan and Power values
+        // updateField('Fan 0');
+        // updateField('Pow 0');
+    }
+
+</script>
 </body>
 </html>
