@@ -8,6 +8,8 @@ import wifimgr
 import time
 from microdot.websocket import WebSocket, with_websocket
 import ujson as json
+from finalize_log import add_events_to_log
+
 
 # Initialize thermocouple
 spi = SPI(1, baudrate=4000000, polarity=0, phase=0, sck=Pin(18), mosi=None, miso=Pin(12))
@@ -88,132 +90,24 @@ async def index(request):
 async def start_roast():
     global is_roast_active, roast_start_time
     if not is_roast_active:
-        # Create new roast log file with initial details
-        current_time = time.localtime()
         roast_start_time = time.time()
-        date_str = f"Date:{current_time[2]:02d}.{current_time[1]:02d}.{current_time[0]}"
-        initial_line = f"{date_str}\tUnit:F\tCHARGE:00:00\tTP:\tDRYe:\tFCs:\tFCe:\tSCs:\tSCe:\tDROP:\tCOOL:\tTime:\nTime1\tTime2\tET\tBT\tEvent"
-        with open(log_file_path, 'w') as file:
-            file.write(initial_line + '\n')
         is_roast_active = True
-
-
-async def add_events_to_log():
-    # Load log file
-    with open(log_file_path, 'r') as f:
-        lines = f.readlines()
-
-    # Extract the first line (header) and split it by tabs
-    header = lines[0].strip().split('\t')
-
-    # Extract the times and event names from the header, excluding the date
-    event_times = {}
-    for item in header:
-        if item.startswith("Date:") or item.startswith("Unit:") or item.startswith("Time"):
-            continue  # Skip the date entry
-        if ':' in item:
-            parts = item.split(':', 1)  # Only split at the first colon
-            event_name = parts[0].strip()  # Get the event name (part before the colon)
-            event_time = parts[1].strip() if len(parts) > 1 else ''  # Get the event time (part after the colon)
-
-            # Only store events with valid times
-            if event_time:
-                event_times[event_time] = event_name
-
-    # Process each data line and add the corresponding event only if needed
-    updated_lines = [lines[0]]  # Start with the header
-    for line in lines[1:]:
-        parts = line.strip().split('\t')
-
-        if len(parts) > 5:
-            updated_lines.append(line)  # Keep the line as is if it's incomplete
-            continue
-
-        time_entry = parts[0]  # Use the Time1 column for matching
-
-        current_event = parts[-1]  # Current event in the Event column
-        new_event = event_times.get(time_entry, '')
-
-        if new_event != '':
-            parts.append(new_event)
-            updated_lines.append('\t'.join(parts) + '\n')
-        else:
-            updated_lines.append(line)  # Keep the line as is if no update is needed
-
-    # Write updated lines back to the file line by line
-    with open(log_file_path, 'w') as f:
-        for line in updated_lines:
-            f.write(line)
 
 
 async def stop_roast():
     global is_roast_active, roast_start_time, charge_started, charge_start_time, events
     if is_roast_active:
-        # Update the Time field in the log file
-        await update_log_file({'fields': 'Time'})
         is_roast_active = False
         roast_start_time = 0
         charge_started = False
         charge_start_time = 0
-        await add_events_to_log()
-        print(events)
-
-
-async def update_log_file(field_updates):
-    global is_roast_active, roast_start_time, charge_start_time, charge_started
-    if is_roast_active:
-        # Calculate total elapsed time
-        elapsed_time = time.time() - roast_start_time
-        elapsed_minutes = elapsed_time // 60
-        elapsed_seconds = elapsed_time % 60
-        elapsed_str = f"{int(elapsed_minutes):02d}:{int(elapsed_seconds):02d}"
-
-        try:
-            with open(log_file_path, 'r') as file:
-                lines = file.readlines()
-
-            top_line = lines[0].strip()
-            fields = top_line.split('\t')
-            print(field_updates)
-            if 'CHARGE' in field_updates['fields']:
-                charge_start_time = time.time()
-                charge_started = True
-
-            for key, value in field_updates.items():
-                for i in range(len(fields)):
-
-                    if fields[i].startswith(value + ":"):
-                        fields[i] = f"{value}:{elapsed_str}"
-                        break
-
-            updated_top_line = '\t'.join(fields)
-
-            # Write the updated top line back to the file, followed by the remaining lines
-            with open(log_file_path, 'w') as file:
-                file.write(updated_top_line + '\n')
-                for line in lines[1:]:
-                    file.write(line)
-
-            return {'success': True, 'updated_line': updated_top_line}
-        except Exception as e:
-            print(f"Error updating log file: {e}")
-            return {'success': False, 'error': str(e)}
-    return {'success': False, 'error': 'Roast Not Started'}
-
-
-@app.route('/update_log', methods=['POST'])
-async def update_log(request):
-    data = request.json
-    if not data:
-        return {'error': 'Invalid or missing data.'}, 400
-    response = await update_log_file(data)
-    return response
+        add_events_to_log(events, log_file_path)
 
 
 @app.route('/ws/add_event')
 @with_websocket
 async def add_event_websocket(request, ws):
-    global is_roast_active, events
+    global is_roast_active, events, charge_started, charge_start_time
     try:
         while True:
             # Receive event name from the client
@@ -240,6 +134,9 @@ async def add_event_websocket(request, ws):
                 # Add the event to the global dictionary
                 events[elapsed_str] = event_name
                 print(f"Event added: {elapsed_str} -> {event_name}")
+                if event_name == 'CHARGE':
+                    charge_start_time = time.time()
+                    charge_started = True
             else:
                 print(f"{event_name} skipped no roast active")
 
@@ -311,7 +208,6 @@ async def main():
 
     while True:
         await asyncio.sleep(1)
-
 
 try:
     asyncio.run(main())
