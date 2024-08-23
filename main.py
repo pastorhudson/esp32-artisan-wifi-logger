@@ -78,13 +78,15 @@ async def index(request):
 
 
 async def start_roast():
-    global is_roast_active, roast_start_time
+    global is_roast_active, roast_start_time, events
     if not is_roast_active:
         roast_start_time = time.time()
         is_roast_active = True
         # Open the log file in write mode to reset or create a new file
         with open(log_file_path, 'w') as log_file:
             pass
+        events['00:00'] = f'Fan {fan_speed}, Pow {power}'
+
 
 async def stop_roast(time_stamp):
     global is_roast_active, roast_start_time, charge_started, charge_start_time, events
@@ -93,6 +95,8 @@ async def stop_roast(time_stamp):
         roast_start_time = 0
         charge_started = False
         charge_start_time = 0
+        print(events)
+
         add_events_to_log(events, log_file_path, time_stamp)
 
 

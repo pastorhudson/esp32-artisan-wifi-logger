@@ -151,7 +151,7 @@
             <option value="33">3</option>
             <option value="44">4</option>
             <option value="55">5</option>
-            <option value="6">6</option>
+            <option value="66">6</option>
             <option value="77">7</option>
             <option value="88">8</option>
             <option value="99">9</option>
@@ -223,16 +223,25 @@
             name: 'Temperature',
             data: [0],
             color: '#6f4e37',
+            marker: {
+            enabled: false  // Disable markers
+        }
         },
             {
             name: 'Fan Speed',
             data: [0],
-            color: '#3382ba'
+            color: '#3382ba',
+            marker: {
+            enabled: false  // Disable markers
+        }
         },
         {
             name: 'Power',
             data: [0],
-            color: '#ca0505'
+            color: '#ca0505',
+            marker: {
+            enabled: false  // Disable markers
+        }
         }],
         responsive: {
             rules: [{
@@ -270,7 +279,6 @@
 
         dataWs.onmessage = function(event) {
             let receivedData = JSON.parse(event.data);
-            console.log(receivedData)
             updateChart(receivedData);
         };
 

@@ -1,10 +1,16 @@
-
 def parse_iso8601(time_stamp):
     date, time = time_stamp.split('T')
     year, month, day = map(int, date.split('-'))
-    hour, minute, second = map(int, time[:-1].split(':'))  # Remove 'Z' and split
-    # Assuming no timezone offsets for simplicity and ignoring milliseconds
-    return (year, month, day, hour, minute, second)
+
+    # Split off the 'Z' and then handle the time components
+    time = time[:-1]  # Remove 'Z'
+    time_parts = time.split(':')
+    hour, minute = map(int, time_parts[:2])  # Get hours and minutes as integers
+
+    # Split seconds and milliseconds
+    second, millisecond = map(int, time_parts[2].split('.'))
+
+    return (year, month, day, hour, minute, second, millisecond)
 
 
 def get_last_line_time(log_file_path):
@@ -85,7 +91,7 @@ def add_events_to_log(events, log_file_path, time_stamp):
 
 
 if __name__ == '__main__':
-    events = {'00:02': 'CHARGE', '00:24': 'Fan 4', '00:27': 'Pow 6', '00:18': 'Fan 8',
+    events = {'00:01': 'Fan 2, Pow 6', '00:02': 'CHARGE', '00:24': 'Fan 4', '00:27': 'Pow 6', '00:18': 'Fan 8',
               '00:21': 'Pow 4', '00:16': 'FCs', '00:14': 'Pow 7',
               '00:22': 'FCe', '00:38': 'Pow 9', '00:13': 'Fan 1',
               '00:10': 'Pow 6', '00:11': 'DRYe', '00:37': 'Fan 8',
@@ -93,4 +99,5 @@ if __name__ == '__main__':
               '00:09': 'Fan 2', '00:07': 'TP', '00:06': 'Pow 4', '00:04': 'Fan 1'}
 
     log_file_path = 'roast_log.txt'
-    add_events_to_log(events, log_file_path)
+    add_events_to_log(events, log_file_path, '2024-08-23T20:12:04.848Z')
+    # print(parse_iso8601('2024-08-23T20:12:04.848Z'))
