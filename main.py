@@ -85,7 +85,7 @@ async def start_roast():
         # Open the log file in write mode to reset or create a new file
         with open(log_file_path, 'w') as log_file:
             pass
-        events['00:00'] = f'Fan {fan_speed}, Pow {power}'
+        events['00:00'] = f'Fan {fan_speed},Pow {power}'
 
 
 async def stop_roast(time_stamp):
@@ -95,7 +95,6 @@ async def stop_roast(time_stamp):
         roast_start_time = 0
         charge_started = False
         charge_start_time = 0
-        print(events)
 
         add_events_to_log(events, log_file_path, time_stamp)
 
@@ -130,7 +129,6 @@ async def add_event_websocket(request, ws):
                 print(f"Roast Started!")
             elif event_name == 'STOP':
                 time_stamp = event_data.get('timestamp')
-                print(time_stamp)
                 await stop_roast(time_stamp)
                 print(f"Roast Stopped!")
             elif is_roast_active:

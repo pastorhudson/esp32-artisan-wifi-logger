@@ -78,11 +78,15 @@ def add_events_to_log(events, log_file_path, time_stamp):
         time = parts[0]
         event_list = [event for event_time, event in events.items() if event_time == time]
         if event_list:
-            parts.append((','.join(event_list) + '\n'))
+            if len(parts) > 1:
+                parts[4] = ','.join(event_list)  # Update the existing event column
+            else:
+                parts.append(','.join(event_list))  # No existing event column, append one
         else:
-            parts.append('\n')
+            if len(parts) > 1:
+                parts[4] = ''  # Clear the existing event column if no events
 
-        updated_log.append('\t'.join(parts))
+        updated_log.append('\t'.join(parts) + '\n')
 
     with open(log_file_path, 'w') as f:
         for line in updated_log:
@@ -91,7 +95,7 @@ def add_events_to_log(events, log_file_path, time_stamp):
 
 
 if __name__ == '__main__':
-    events = {'00:01': 'Fan 2, Pow 6', '00:02': 'CHARGE', '00:24': 'Fan 4', '00:27': 'Pow 6', '00:18': 'Fan 8',
+    events = {'00:01': 'Fan 2,Pow 6', '00:02': 'CHARGE', '00:24': 'Fan 4', '00:27': 'Pow 6', '00:18': 'Fan 8',
               '00:21': 'Pow 4', '00:16': 'FCs', '00:14': 'Pow 7',
               '00:22': 'FCe', '00:38': 'Pow 9', '00:13': 'Fan 1',
               '00:10': 'Pow 6', '00:11': 'DRYe', '00:37': 'Fan 8',
